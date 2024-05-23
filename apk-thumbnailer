@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# preferred variable nanes
+package_location=$1
+thumbnail_location=$2
+thumbnail_scale=$3
+
+# get the location of the icon within the package
+icon_inner_location=$(aapt d --values badging "$package_location" | grep application-icon- | tail -n 1 | cut -d':' -f2 | tr -d \')
+
+# unzip the icon into a temp dir
+temp_dir=$(mktemp --directory)
+unzip -qq -o -d $temp_dir "$package_location" "$icon_inner_location"
+
+# generate a thumbnail from the icon
+convert -thumbnail "$thumbnail_scale" "$temp_dir"/"$icon_inner_location" "$thumbnail_location"
+
+# remove the temporary directory
+rm -rf "$temp_dir"
